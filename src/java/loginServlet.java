@@ -64,6 +64,7 @@ public class loginServlet extends HttpServlet {
                 try {
                     c.close();
                     db.closeConnection();
+                    request.setAttribute("username", u);
                 } catch (SQLException ex) {
                     Logger.getLogger(loginServlet.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -111,8 +112,6 @@ public class loginServlet extends HttpServlet {
                 //Creamos los cookies de inicio
                 response.addCookie(createCookie("username", username, 60));
                 response.addCookie(createCookie("password", password, 60));
-                //RequestDispatcher dispatcher = getServletContext().getRequestDispatcher("/index.jsp");
-                //dispatcher.forward(request, response);
                 response.setContentType("application/json");
                 pw = response.getWriter();
                 pw.println("{\"mess\":\"Correct Login\"}");

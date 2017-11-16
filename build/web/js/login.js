@@ -6,6 +6,7 @@
 
 $(document).ready(function () {
 //Events
+
     $("#butUp").click(function () {
         $("#butIn").hide();
         $("#butUp").hide();
@@ -84,6 +85,8 @@ function sendLoginInformation() {
         data: {username: u, password: p},
         success: function (rsp) {
             alert(rsp["mess"]);
+            location.reload();
+            //document.location.href="./loginServlet";
         },
         error: function (e) {
             alert("Failed");
@@ -95,6 +98,10 @@ function sendLoginInformation() {
     });
 }
 
+/**
+ * 
+ * @returns {undefined}
+ */
 function sendCreateUserInformation() {
     var url = "createUserServlet";
     var n = $("#inpName").val();
