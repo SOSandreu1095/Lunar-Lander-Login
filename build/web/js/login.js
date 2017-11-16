@@ -26,27 +26,27 @@ $(document).ready(function () {
     });
 
     $("#butIn").click(function () {
-        if(checkLoginFields()){
+        if (checkLoginFields()) {
             sendLoginInformation();
         }
     });
-    
+
     $("#butCreate").click(function () {
-        if(checkCreateFields()){
+        if (checkCreateFields()) {
             sendCreateInformation();
         }
     });
-    
+
 });
 
 
-function checkLoginFields(){
-    if ($("#inpUser").val().length == 0){
+function checkLoginFields() {
+    if ($("#inpUser").val().length == 0) {
         $("#inpUser").focus();
         alert("INSERT YOUR USERNAME");
         return false;
     }
-    if ($("#inpPass").val().length == 0){
+    if ($("#inpPass").val().length == 0) {
         $("#inpPass").focus();
         alert("INSERT YOUR PASSWORD");
         return false;
@@ -54,18 +54,18 @@ function checkLoginFields(){
     return true;
 }
 
-function checkCreateFields(){
-    if ($("#inpUser").val().length == 0){
+function checkCreateFields() {
+    if ($("#inpUser").val().length == 0) {
         $("#inpUser").focus();
         alert("INSERT YOUR USERNAME");
         return false;
     }
-    if ($("#inpPass").val().length == 0){
+    if ($("#inpPass").val().length == 0) {
         $("#inpPass").focus();
         alert("INSERT YOUR PASSWORD");
         return false;
     }
-    if ($("#inpName").val().length == 0){
+    if ($("#inpName").val().length == 0) {
         $("#inpName").focus();
         alert("INSERT YOUR NAME");
         return false;
@@ -73,6 +73,29 @@ function checkCreateFields(){
     return true;
 }
 
-function sendLoginInformation(){
-    alert("The informations is send")
+function sendLoginInformation() {
+    alert("The informations is send");
+    var url = "loginServlet";
+}
+
+function sendCreateInformation() {
+    var url = "loginServlet";
+    var n = $("#inpName").val();
+    var u = $("#inpUser").val();
+    var p = $("#inpPass").val();
+    $.ajax({
+        method: "POST",
+        url: url,
+        data: {name: n, username: u, password: p},
+        success: function (rsp) {
+            alert(rsp["mess"]);
+        },
+        error: function (e) {
+            alert("Failed");
+            if (e["responseJSON"] === undefined)
+                alert("emess");
+            else
+                alert(e["responseJSON"]["error"]);
+        }
+    });
 }

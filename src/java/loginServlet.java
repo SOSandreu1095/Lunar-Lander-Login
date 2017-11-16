@@ -6,6 +6,13 @@
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
@@ -76,16 +83,87 @@ public class loginServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+
+        String name = request.getParameter("name");
+        String username = request.getParameter("username");
+        String password = request.getParameter("password");
+        DatabaseManager db = null;
+        Connection c = null;
+        PrintWriter pw;
+
+        try {
+            db = new DatabaseManager();
+            c = db.doConnection();
+            //Mirar si un usuario determinado existe, para no duplicarlo
+            if (!existsUser(c, username)) {
+                createUser(c, name, username, password);
+                response.setContentType("application/json");
+                pw = response.getWriter();
+                pw.println("{\"mess\":\"User created succesfully\"}");
+            } else {
+                response.setContentType("application/json");
+                pw = response.getWriter();
+                pw.println("{\"mess\":\"The user already exists\"}");
+            }
+        } catch (Exception ex) {
+            response.setContentType("application/json");
+            pw = response.getWriter();
+            pw.println("{\"error\":\"Error during the creation\"}");
+        } finally {
+            try {
+                c.close();
+                db.closeConnection();
+            } catch (SQLException ex) {
+                Logger.getLogger(loginServlet.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+
     }
 
     /**
-     * Returns a short description of the servlet.
-     *
-     * @return a String containing servlet description
+     * 
+     * @param c
+     * @param n
+     * @param u
+     * @param p 
      */
-    @Override
-    public String getServletInfo() {
-        return "Short description";
-    }// </editor-fold>
+    public void createUser(Connection c, String n, String u, String p) {
+        try {
+            String query = "INSERT INTO user (name, username, password) VALUES (?, ?, ?)";
+            PreparedStatement prepstmt = c.prepareStatement(query);
+            prepstmt.setString(1, n);
+            prepstmt.setString(2, u);
+            prepstmt.setString(3, p);
+            prepstmt.execute();
 
+            //Can't use ResultSet after close prepared statement, we have to print or fill object here...
+            prepstmt.close();
+        } catch (SQLException ex) {
+            System.out.println("ERROR: " + ex.getMessage());
+        }
+    }
+
+    /**
+     * 
+     * @param c
+     * @param username
+     * @return 
+     */
+    private boolean existsUser(Connection c, String username) {
+        Statement stmt = null;
+        String query = "SELECT * FROM user WHERE username = \""+username+"\"";
+        System.out.println(query);
+        try {
+            stmt = c.createStatement();
+            ResultSet rs = stmt.executeQuery(query);
+            if (rs.next()) { //Si entra aqui es porque ya existe ese usuario
+                return true;
+            } else {
+                return false; //Si no existe devuelve false
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(loginServlet.class.getName()).log(Level.SEVERE, null, ex);
+            return true;
+        }
+    }
 }
