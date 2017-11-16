@@ -32,8 +32,8 @@ $(document).ready(function () {
     });
 
     $("#butCreate").click(function () {
-        if (checkCreateFields()) {
-            sendCreateInformation();
+        if (checkCreateUserFields()) {
+            sendCreateUserInformation();
         }
     });
 
@@ -54,7 +54,7 @@ function checkLoginFields() {
     return true;
 }
 
-function checkCreateFields() {
+function checkCreateUserFields() {
     if ($("#inpUser").val().length == 0) {
         $("#inpUser").focus();
         alert("INSERT YOUR USERNAME");
@@ -74,12 +74,29 @@ function checkCreateFields() {
 }
 
 function sendLoginInformation() {
-    alert("The informations is send");
+
     var url = "loginServlet";
+    var u = $("#inpUser").val();
+    var p = $("#inpPass").val();
+    $.ajax({
+        method: "POST",
+        url: url,
+        data: {username: u, password: p},
+        success: function (rsp) {
+            alert(rsp["mess"]);
+        },
+        error: function (e) {
+            alert("Failed");
+            if (e["responseJSON"] === undefined)
+                alert("emess");
+            else
+                alert(e["responseJSON"]["error"]);
+        }
+    });
 }
 
-function sendCreateInformation() {
-    var url = "loginServlet";
+function sendCreateUserInformation() {
+    var url = "createUserServlet";
     var n = $("#inpName").val();
     var u = $("#inpUser").val();
     var p = $("#inpPass").val();

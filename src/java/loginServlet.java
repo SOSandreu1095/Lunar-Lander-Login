@@ -27,17 +27,10 @@ import javax.servlet.http.HttpServletResponse;
 public class loginServlet extends HttpServlet {
 
     /**
-     * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
-     * methods.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
-    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
-    /**
-     * Handles the HTTP <code>GET</code> method.
+     * Handles the HTTP <code>GET</code> method. Will check if exists the
+     * cookies of the username / password If the cookies exists, will check it
+     * if their values are the correct login in the database, if are correct it
+     * will redirect to the game, if not it will redirect to the login screen
      *
      * @param request servlet request
      * @param response servlet response
@@ -47,33 +40,53 @@ public class loginServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        String cookieName = "tipo";
-        String cookieValue = "jsp";
+        String cookieUser = "username";
+        String cookiePass = "password";
+        String u = null;
+        String p = null;
         Cookie[] cookies = request.getCookies();
 
         if (cookies != null) {
             //Recorremos los cookies y buscamos el nuestro
             for (int i = 0; i < cookies.length; i++) {
-                //Si es el tipo que queremos y tiene el valor deseado, redireccionaremos al index directamente
-                if (cookieName.equals(cookies[i].getName()) && cookieValue.equals(cookies[i].getValue())) {
-                    //Para redireccionar
-                    RequestDispatcher dispatcher = getServletContext().getRequestDispatcher("/index.jsp");
-                    dispatcher.forward(request, response);
+                //Get the username
+                if (cookieUser.equals(cookies[i].getName())) {
+                    u = cookies[i].getValue();
+                }
+                //Get the password
+                if (cookiePass.equals(cookies[i].getName())) {
+                    p = cookies[i].getValue();
                 }
             }
-
+            DatabaseManager db = new DatabaseManager();
+            Connection c = db.doConnection();
+            if (DatabaseOperations.correctLogin(c, u, p)) {
+                try {
+                    c.close();
+                    db.closeConnection();
+                } catch (SQLException ex) {
+                    Logger.getLogger(loginServlet.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                RequestDispatcher dispatcher = getServletContext().getRequestDispatcher("/index.jsp");
+                dispatcher.forward(request, response);
+            }
+            try {
+                c.close();
+                db.closeConnection();
+            } catch (SQLException ex) {
+                Logger.getLogger(loginServlet.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
-        //Iriamos al login y crearemos un cookie para ir directamente al jsp la proxima vez
-        //Si no hay cookies le redireccionamos al login
-        Cookie userCookie = new Cookie(cookieName, cookieValue);
-        userCookie.setMaxAge(60); //Store cookie for 1 min
-        response.addCookie(userCookie);
+
         RequestDispatcher dispatcher = getServletContext().getRequestDispatcher("/login.html");
         dispatcher.forward(request, response);
     }
 
     /**
-     * Handles the HTTP <code>POST</code> method.
+     * Handles the HTTP <code>POST</code> method. Check if the information about
+     * the username and the password is correct If it's correct,it will redirect
+     * to the game screen If it is not correct it will warn it and will keep in
+     * the login screen
      *
      * @param request servlet request
      * @param response servlet response
@@ -84,7 +97,6 @@ public class loginServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        String name = request.getParameter("name");
         String username = request.getParameter("username");
         String password = request.getParameter("password");
         DatabaseManager db = null;
@@ -95,15 +107,19 @@ public class loginServlet extends HttpServlet {
             db = new DatabaseManager();
             c = db.doConnection();
             //Mirar si un usuario determinado existe, para no duplicarlo
-            if (!existsUser(c, username)) {
-                createUser(c, name, username, password);
+            if (DatabaseOperations.correctLogin(c, username, password)) {
+                //Creamos los cookies de inicio
+                response.addCookie(createCookie("username", username, 60));
+                response.addCookie(createCookie("password", password, 60));
+                //RequestDispatcher dispatcher = getServletContext().getRequestDispatcher("/index.jsp");
+                //dispatcher.forward(request, response);
                 response.setContentType("application/json");
                 pw = response.getWriter();
-                pw.println("{\"mess\":\"User created succesfully\"}");
+                pw.println("{\"mess\":\"Correct Login\"}");
             } else {
                 response.setContentType("application/json");
                 pw = response.getWriter();
-                pw.println("{\"mess\":\"The user already exists\"}");
+                pw.println("{\"mess\":\"Wrong Username / password\"}");
             }
         } catch (Exception ex) {
             response.setContentType("application/json");
@@ -117,53 +133,12 @@ public class loginServlet extends HttpServlet {
                 Logger.getLogger(loginServlet.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-
     }
 
-    /**
-     * 
-     * @param c
-     * @param n
-     * @param u
-     * @param p 
-     */
-    public void createUser(Connection c, String n, String u, String p) {
-        try {
-            String query = "INSERT INTO user (name, username, password) VALUES (?, ?, ?)";
-            PreparedStatement prepstmt = c.prepareStatement(query);
-            prepstmt.setString(1, n);
-            prepstmt.setString(2, u);
-            prepstmt.setString(3, p);
-            prepstmt.execute();
-
-            //Can't use ResultSet after close prepared statement, we have to print or fill object here...
-            prepstmt.close();
-        } catch (SQLException ex) {
-            System.out.println("ERROR: " + ex.getMessage());
-        }
+    private Cookie createCookie(String name, String value, int maxAgeSec) {
+        Cookie c = new Cookie(name, value);
+        c.setMaxAge(maxAgeSec); //Store cookie for 1 min
+        return c;
     }
 
-    /**
-     * 
-     * @param c
-     * @param username
-     * @return 
-     */
-    private boolean existsUser(Connection c, String username) {
-        Statement stmt = null;
-        String query = "SELECT * FROM user WHERE username = \""+username+"\"";
-        System.out.println(query);
-        try {
-            stmt = c.createStatement();
-            ResultSet rs = stmt.executeQuery(query);
-            if (rs.next()) { //Si entra aqui es porque ya existe ese usuario
-                return true;
-            } else {
-                return false; //Si no existe devuelve false
-            }
-        } catch (SQLException ex) {
-            Logger.getLogger(loginServlet.class.getName()).log(Level.SEVERE, null, ex);
-            return true;
-        }
-    }
 }

@@ -4,6 +4,10 @@
         <servlet-name>loginServlet</servlet-name>
         <servlet-class>loginServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>createUserServlet</servlet-name>
+        <servlet-class>createUserServlet</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>loginServlet</servlet-name>
         <url-pattern>/loginServlet</url-pattern>
@@ -11,7 +15,10 @@
     <welcome-file-list>
         <welcome-file>loginServlet</welcome-file>
     </welcome-file-list>
-
+    <servlet-mapping>
+        <servlet-name>createUserServlet</servlet-name>
+        <url-pattern>/createUserServlet</url-pattern>
+    </servlet-mapping>
     <session-config>
         <session-timeout>
             30
