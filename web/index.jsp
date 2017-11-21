@@ -5,10 +5,10 @@
 --%>
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
-<%String uid = (String) request.getAttribute("username"); %>
+<%String username = (String) request.getAttribute("username"); %>
 
 <%
-    if (uid == null) {
+    if (username == null) {
         response.sendRedirect("youshallnotpass.html");
     }
 %>
@@ -40,7 +40,7 @@
                     <!-- Mod<l content-->
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h4 class="modal-title">OPCIONES</h4>
+                            <h4 class="modal-title">OPCIONES DE USUARIO: <span id="username"><%=username%></span></h4>
                         </div>
                         <div class="modal-body center-text">
                             <label for="sel1">Selecciona una configuración existente o crea una nueva</label>

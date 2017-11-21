@@ -11,16 +11,18 @@ var intentos = 1;
 var modeloNave = "estandar";
 var modeloLuna = "amarilla";
 var timerFuel = null;
+var username;
 
 var arrayConfiguraciones = [];
 
 window.onload = function () {
+    // Seteamos el nombre de primeras
+    username = $("#username").text();
 
-    mostrarMenuPrincipal();
     cambiarDificultad();
     cambiarModeloNave();
     cambiarModeloLuna();
-    //initConfig();
+    initConfig();
 
     $("#btnDeteteConfig").click(function () {
         //borrarConfiguracion();
@@ -43,7 +45,7 @@ window.onload = function () {
     });
 
     $("#btnSave").click(function () {
-       // saveConfig()();
+        saveConfig()();
     });
 
 
@@ -543,33 +545,31 @@ function cambiarDificultad() {
 }
 
 function initConfig() {
-//    pausar();
-//    stop();
-//    var url = "getFileExc";
-//    var emess = "Error desconocido";
-//
-//    $.ajax({
-//        method: "GET",
-//        url: url,
-//        dataType: 'json',
-//        success: function (jsn) {
-//            $.each(jsn, function (i, item) {
-//                var nombre = jsn[i].nombre;
-//                var dif = jsn[i].dificultad;
-//                var nav = jsn[i].modeloNave;
-//                var lun = jsn[i].modeloLuna;
-//                addConfigurationToArray(nombre, dif, nav, lun);
-//            });
-//        },
-//        error: function (e) {
-//            if (e["responseJSON"] === undefined)
-//                alert(emess);
-//            else
-//                alert(e["responseJSON"]["error"]);
-//        }
-//    });
+    //CARGA LAS CONFIGURACIONES DEL USUARIO (SI LAS TIENE)
+    cargarConfiguraciones(username);
+    mostrarMenuPrincipal();
 }
 
+function cargarConfiguraciones(username) {
+    var url = "configServlet";
+    $.ajax({
+        method: "POST",
+        url: url,
+        data: {username: username},
+        success: function (jsn) {
+            $.each(jsn, function (i) {
+                var nombre = jsn[i].nombre;
+                var dif = jsn[i].dificultad;
+                var nav = jsn[i].modeloNave;
+                var lun = jsn[i].modeloLuna;
+                addConfigurationToArray(nombre, dif, nav, lun);
+            });
+        },
+        error: function (e) {
+            alert("No tiene configuraciones");
+        }
+    });
+}
 
 function saveConfig() {
     var n = $("#nameConfigText").val();
@@ -577,13 +577,13 @@ function saveConfig() {
     var nav = modeloNave;
     var lun = modeloLuna;
 
-    var emess = "Error desconadafdfafdaocido";
-    var url = "getFileExc"; //doPost->SaveFile
+    var emess = "Error desconocido";
+    var url = "nuevaConfigServlet"; //doPost->SaveFile
     if ((n != null) && (n.length != 0)) {
         $.ajax({
             method: "POST",
             url: url,
-            data: {nombre: n, dificultad: d, modeloNave: nav, modeloLuna: lun},
+            data: {username: username, nombre: n, dificultad: d, modeloNave: nav, modeloLuna: lun},
             success: function (rsp) {
                 addConfigurationToArray(n, d, nav, lun);
                 alert(rsp["mess"]);

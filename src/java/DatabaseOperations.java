@@ -7,6 +7,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -140,33 +141,79 @@ public class DatabaseOperations {
                 + ") AUTO_INCREMENT=1;";
 
         try {
-            
+
             System.out.println("INTENTANDO CREAR");
             PreparedStatement ps = c.prepareStatement(queryUser);
             ps.executeUpdate();
-            
-            //Thread.sleep(500);
 
             ps = c.prepareStatement(queryConf);
             ps.executeUpdate();
-            
-           // Thread.sleep(500);
 
             ps = c.prepareStatement(queryScore);
             ps.executeUpdate();
-            
-            //Thread.sleep(500);
 
             System.out.println("CREADO TODO");
 
         } catch (SQLException ex) {
             Logger.getLogger(loginServlet.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
 
-        } 
-//        catch (InterruptedException ex) {
-//            Logger.getLogger(DatabaseOperations.class.getName()).log(Level.SEVERE, null, ex);
-//        }
+    public static ArrayList<Configuracion> getConfiguraciones(Connection c, String username) {
+        ArrayList<Configuracion> listConf = new ArrayList<>();
 
+        Statement stmt = null;
+        String query = "SELECT *\n"
+                + "FROM user a\n"
+                + "INNER JOIN configuration b\n"
+                + "ON (a.id = b.user_id AND a.name=\"" + username + "\");";
+        try {
+            stmt = c.createStatement();
+            ResultSet rs = stmt.executeQuery(query);
+            System.out.println(query);
+            while (rs.next()) { //Cada vez que entremos aqui le pondremos una configuraciones
+                listConf.add(new Configuracion(rs.getString("config_name"), rs.getString("dificultad"), rs.getString("modelo_nave"), rs.getString("modelo_luna")));
+                System.out.println("CONFIGURACION FINDED");
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(loginServlet.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return listConf;
+    }
+
+    public static int getUid(Connection c, String username) {
+        Statement stmt = null;
+        String query = "SELECT id FROM user WHERE (username=\"" + username + "\");";
+        try {
+            stmt = c.createStatement();
+            ResultSet rs = stmt.executeQuery(query);
+            System.out.println(query);
+            if (rs.next()) { //Cada vez que entremos aqui le pondremos una configuraciones
+                return rs.getInt("id");
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(loginServlet.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return -1;
+    }
+
+    public static void insertConfiguration(Connection c, String username, Configuracion conf) {
+        try {
+            int uid = getUid(c, username);
+            
+            String query = "INSERT INTO `configuration`(`user_id`, `config_name`, `dificultad`, `modelo_nave`, `modelo_luna`) "
+                    + "VALUES (?,?,?,?,?);";
+            PreparedStatement preparedStatement = c.prepareStatement(query);
+            preparedStatement.setInt(1, uid);
+            preparedStatement.setString(2, conf.getNombre());
+            preparedStatement.setString(3, conf.getDificultad());
+            preparedStatement.setString(4, conf.getModeloNave());
+            preparedStatement.setString(5, conf.getModeloLuna());
+            // execute insert SQL stetement
+            preparedStatement.executeUpdate();
+        } catch (SQLException ex) {
+            Logger.getLogger(DatabaseOperations.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
 }

@@ -48,17 +48,6 @@ public class loginServlet extends HttpServlet {
 
     }
 
-    /**
-     * Handles the HTTP <code>GET</code> method. Will check if exists the
-     * cookies of the username / password If the cookies exists, will check it
-     * if their values are the correct login in the database, if are correct it
-     * will redirect to the game, if not it will redirect to the login screen
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -85,7 +74,7 @@ public class loginServlet extends HttpServlet {
 
             //Si el usuario esta conectado correctamente, cargaremos sus configuraciones
             if (DatabaseOperations.correctLogin(c, u, p)) {
-
+                //Coger sus configuraciones (si tiene), para cargárselas
                 try {
                     c.close();
                     db.closeConnection();

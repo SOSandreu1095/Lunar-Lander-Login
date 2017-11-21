@@ -9,8 +9,12 @@
         <servlet-class>createUserServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>getFileExc</servlet-name>
-        <servlet-class>getFileExc</servlet-class>
+        <servlet-name>configServlet</servlet-name>
+        <servlet-class>configServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>nuevaConfigServlet</servlet-name>
+        <servlet-class>nuevaConfigServlet</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>loginServlet</servlet-name>
@@ -24,8 +28,12 @@
         <url-pattern>/createUserServlet</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>getFileExc</servlet-name>
-        <url-pattern>/getFileExc</url-pattern>
+        <servlet-name>configServlet</servlet-name>
+        <url-pattern>/configServlet</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>nuevaConfigServlet</servlet-name>
+        <url-pattern>/nuevaConfigServlet</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>
