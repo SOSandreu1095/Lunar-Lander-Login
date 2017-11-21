@@ -8,6 +8,10 @@
         <servlet-name>createUserServlet</servlet-name>
         <servlet-class>createUserServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>getFileExc</servlet-name>
+        <servlet-class>getFileExc</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>loginServlet</servlet-name>
         <url-pattern>/loginServlet</url-pattern>
@@ -18,6 +22,10 @@
     <servlet-mapping>
         <servlet-name>createUserServlet</servlet-name>
         <url-pattern>/createUserServlet</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>getFileExc</servlet-name>
+        <url-pattern>/getFileExc</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>

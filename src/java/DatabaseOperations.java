@@ -1,4 +1,7 @@
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -12,13 +15,12 @@ import java.util.logging.Logger;
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 /**
  *
  * @author admin
  */
 public class DatabaseOperations {
-    
+
     public static void createUser(Connection c, String n, String u, String p) {
         try {
             String query = "INSERT INTO user (name, username, password) VALUES (?, ?, ?)";
@@ -36,14 +38,14 @@ public class DatabaseOperations {
     }
 
     /**
-     * 
+     *
      * @param c
      * @param username
-     * @return 
+     * @return
      */
     public static boolean existsUserName(Connection c, String username) {
         Statement stmt = null;
-        String query = "SELECT * FROM user WHERE username = \""+username+"\"";
+        String query = "SELECT * FROM user WHERE username = \"" + username + "\"";
         System.out.println(query);
         try {
             stmt = c.createStatement();
@@ -58,10 +60,10 @@ public class DatabaseOperations {
             return true;
         }
     }
-    
-    public static boolean correctLogin(Connection c, String username, String password){
+
+    public static boolean correctLogin(Connection c, String username, String password) {
         Statement stmt = null;
-        String query = "SELECT * FROM user WHERE username = \""+username+"\" AND password = \""+password+"\"";
+        String query = "SELECT * FROM user WHERE username = \"" + username + "\" AND password = \"" + password + "\"";
         System.out.println(query);
         try {
             stmt = c.createStatement();
@@ -76,5 +78,95 @@ public class DatabaseOperations {
             return true;
         }
     }
-    
+
+    public static void cargarConfiguraciones(Connection c, String u) {
+        Statement stmt = null;
+        String username = null, password = null;
+        String query = "SELECT * FROM user WHERE username = \"" + username + "\" AND password = \"" + password + "\"";
+        System.out.println(query);
+        try {
+            stmt = c.createStatement();
+            ResultSet rs = stmt.executeQuery(query);
+            while (rs.next()) { //Cada vez que entremos aqui le pondremos una configuraciones
+
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(loginServlet.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    public static boolean existenTabalas(Connection c) {
+        Statement stmt = null;
+        String query = "SELECT * FROM user";
+        try {
+            stmt = c.createStatement();
+            stmt.executeQuery(query);
+            return true;
+        } catch (SQLException ex) {
+            System.err.println("");
+            return false;
+        }
+    }
+
+    public static void crearTablas(Connection c) {
+
+        String queryConf = "CREATE TABLE `configuration` (\n"
+                + "  `id` int(11) NOT NULL AUTO_INCREMENT,\n"
+                + "  `user_id` int(11) NOT NULL,\n"
+                + "  `config_name` varchar(20) NOT NULL,\n"
+                + "  `dificultad` varchar(10) NOT NULL,\n"
+                + "  `modelo_nave` varchar(10) NOT NULL,\n"
+                + "  `modelo_luna` varchar(10) NOT NULL,\n"
+                + "    PRIMARY key (`id`),\n"
+                + "    FOREIGN key (`user_id`) REFERENCES `User`(`id`)\n"
+                + ") AUTO_INCREMENT=1;";
+        String queryUser = "CREATE TABLE `user` (\n"
+                + "  `id` int(11) NOT NULL AUTO_INCREMENT,\n"
+                + "  `name` varchar(20) NOT NULL,\n"
+                + "  `username` varchar(20) NOT NULL,\n"
+                + "  `password` varchar(255) NOT NULL,\n"
+                + "PRIMARY key (`id`)\n"
+                + ")AUTO_INCREMENT=1;";
+
+        String queryScore = "CREATE TABLE `score` (\n"
+                + "  `id` int(11) NOT NULL AUTO_INCREMENT,\n"
+                + "  `conf_id` int(11) NOT NULL,\n"
+                + "  `speed` float NOT NULL,\n"
+                + "  `fuel` float NOT NULL,\n"
+                + "  `init_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n"
+                + "  `end_time` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',\n"
+                + "    PRIMARY KEY (`id`),\n"
+                + "    FOREIGN KEY  (`conf_id`) REFERENCES `configuration`(`id`)\n"
+                + ") AUTO_INCREMENT=1;";
+
+        try {
+            
+            System.out.println("INTENTANDO CREAR");
+            PreparedStatement ps = c.prepareStatement(queryUser);
+            ps.executeUpdate();
+            
+            //Thread.sleep(500);
+
+            ps = c.prepareStatement(queryConf);
+            ps.executeUpdate();
+            
+           // Thread.sleep(500);
+
+            ps = c.prepareStatement(queryScore);
+            ps.executeUpdate();
+            
+            //Thread.sleep(500);
+
+            System.out.println("CREADO TODO");
+
+        } catch (SQLException ex) {
+            Logger.getLogger(loginServlet.class.getName()).log(Level.SEVERE, null, ex);
+
+        } 
+//        catch (InterruptedException ex) {
+//            Logger.getLogger(DatabaseOperations.class.getName()).log(Level.SEVERE, null, ex);
+//        }
+
+    }
+
 }

@@ -26,6 +26,28 @@ import javax.servlet.http.HttpServletResponse;
  */
 public class loginServlet extends HttpServlet {
 
+    @Override
+    public void init() {
+        DatabaseManager db = new DatabaseManager();
+        Connection c = db.doConnection();
+
+        if (DatabaseOperations.existenTabalas(c)) {
+            System.out.println("LAS TABLAS EXISTEN");
+        } else {
+            System.out.println("HAY QUE CREAR LAS TABLAS");
+            //EJECUTAR SCRIPT
+            DatabaseOperations.crearTablas(c);
+        }
+
+        db.closeConnection();
+        try {
+            c.close();
+        } catch (SQLException ex) {
+            Logger.getLogger(loginServlet.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+    }
+
     /**
      * Handles the HTTP <code>GET</code> method. Will check if exists the
      * cookies of the username / password If the cookies exists, will check it
@@ -60,7 +82,10 @@ public class loginServlet extends HttpServlet {
             }
             DatabaseManager db = new DatabaseManager();
             Connection c = db.doConnection();
+
+            //Si el usuario esta conectado correctamente, cargaremos sus configuraciones
             if (DatabaseOperations.correctLogin(c, u, p)) {
+
                 try {
                     c.close();
                     db.closeConnection();

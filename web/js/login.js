@@ -4,8 +4,11 @@
  * and open the template in the editor.
  */
 
+var createMode = false;
+
 $(document).ready(function () {
 //Events
+
     $("#butUp").click(function () {
         $("#butIn").hide();
         $("#butUp").hide();
@@ -13,6 +16,7 @@ $(document).ready(function () {
         $("#butCreate").show();
         $("#labName").show();
         $("#inpName").show();
+        createMode = true;
     });
 
 
@@ -23,6 +27,7 @@ $(document).ready(function () {
         $("#butCreate").hide();
         $("#labName").hide();
         $("#inpName").hide();
+        createMode = false;
     });
 
     $("#butIn").click(function () {
@@ -34,6 +39,32 @@ $(document).ready(function () {
     $("#butCreate").click(function () {
         if (checkCreateUserFields()) {
             sendCreateUserInformation();
+        }
+    });
+
+    $("#inpPass").on('keyup', function (e) {
+        if (e.keyCode == 13) {
+            if (createMode == false) {
+                $("#butIn").click();
+            } else {
+                $("#butCreate").click();
+            }
+        }
+    });
+
+    $("#inpUser").on('keyup', function (e) {
+        if (e.keyCode == 13) {
+            if (createMode == false) {
+                $("#butIn").click();
+            } else {
+                $("#butCreate").click();
+            }
+        }
+    });
+
+    $("#inpName").on('keyup', function (e) {
+        if (e.keyCode == 13) {
+            $("#butCreate").click();
         }
     });
 
@@ -84,6 +115,8 @@ function sendLoginInformation() {
         data: {username: u, password: p},
         success: function (rsp) {
             alert(rsp["mess"]);
+            location.reload();
+            //document.location.href="./loginServlet";
         },
         error: function (e) {
             alert("Failed");
@@ -95,6 +128,10 @@ function sendLoginInformation() {
     });
 }
 
+/**
+ * 
+ * @returns {undefined}
+ */
 function sendCreateUserInformation() {
     var url = "createUserServlet";
     var n = $("#inpName").val();
