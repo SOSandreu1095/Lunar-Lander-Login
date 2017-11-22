@@ -114,6 +114,9 @@ public class loginServlet extends HttpServlet {
 
         String username = request.getParameter("username");
         String password = request.getParameter("password");
+        String passCrypt = CryptoHash.cryptSHA256(password);
+        System.out.println(CryptoHash.cryptSHA256(password));
+        
         DatabaseManager db = null;
         Connection c = null;
         PrintWriter pw;
@@ -122,10 +125,10 @@ public class loginServlet extends HttpServlet {
             db = new DatabaseManager();
             c = db.doConnection();
             //Mirar si un usuario determinado existe, para no duplicarlo
-            if (DatabaseOperations.correctLogin(c, username, password)) {
+            if (DatabaseOperations.correctLogin(c, username, passCrypt)) {
                 //Creamos los cookies de inicio
                 response.addCookie(createCookie("username", username, 60));
-                response.addCookie(createCookie("password", password, 60));
+                response.addCookie(createCookie("password", passCrypt, 60));
                 response.setContentType("application/json");
                 pw = response.getWriter();
                 pw.println("{\"mess\":\"Correct Login\"}");

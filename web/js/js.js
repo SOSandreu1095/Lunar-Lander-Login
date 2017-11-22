@@ -123,8 +123,8 @@ window.onload = function () {
     }
     is_touch_device();
     //CAPTURANDO EVENTOS DEL PANEL DERECHA
-    $("#renaudar").click(function () {
-        renaudar();
+    $("#reanudar").click(function () {
+        reanudar();
     });
     $("#pausa").click(function () {
         pausar();
@@ -620,33 +620,33 @@ function addConfigurationToArray(nombre, dificultad, nave, luna) {
 }
 
 function borrarConfiguracion() {
-    if ($('#selectConf').length != 0) {
-        var emess = "Error descoeeeeeenocido";
-        var url = "deleteConfigServlet";
-        var i = $("#selectConf option:selected").index();
-        alert(arrayConfiguraciones[i].nombre);
-//        arrayConfiguraciones.splice(i, 1);
-        $("#selectConf option[value='i']").remove();
-        repaintSelect();
-
-//        $.ajax({
-//            method: "POST",
-//            url: url,
-//            data: {nombre: n},
-//            success: function (rsp) {
-//                arrayConfiguraciones.splice(i,1);
-//                alert(rsp["mess"]);
-//            },
-//            error: function (e) {
-//                if (e["responseJSON"] === undefined)
-//                    alert(emess);
-//                else
-//                    alert(e["responseJSON"]["error"]);
-//            }
-//        });
-    } else {
-        alert("No hay ninguna configuración para borrar");
-    }
+//    if ($('#selectConf').length != 0) {
+//        var emess = "Error descoeeeeeenocido";
+//        var url = "deleteConfigServlet";
+//        var i = $("#selectConf option:selected").index();
+//        alert(arrayConfiguraciones[i].nombre);
+////        arrayConfiguraciones.splice(i, 1);
+//        $("#selectConf option[value='i']").remove();
+//        repaintSelect();
+//
+////        $.ajax({
+////            method: "POST",
+////            url: url,
+////            data: {nombre: n},
+////            success: function (rsp) {
+////                arrayConfiguraciones.splice(i,1);
+////                alert(rsp["mess"]);
+////            },
+////            error: function (e) {
+////                if (e["responseJSON"] === undefined)
+////                    alert(emess);
+////                else
+////                    alert(e["responseJSON"]["error"]);
+////            }
+////        });
+//    } else {
+//        alert("No hay ninguna configuración para borrar");
+//    }
 }
 
 function repaintSelect() {

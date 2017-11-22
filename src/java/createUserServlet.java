@@ -28,6 +28,8 @@ public class createUserServlet extends HttpServlet {
       String name = request.getParameter("name");
         String username = request.getParameter("username");
         String password = request.getParameter("password");
+        String passCrypt = CryptoHash.cryptSHA256(password);
+        
         DatabaseManager db = null;
         Connection c = null;
         PrintWriter pw;
@@ -37,7 +39,7 @@ public class createUserServlet extends HttpServlet {
             c = db.doConnection();
             //Mirar si un usuario determinado existe, para no duplicarlo
             if (!DatabaseOperations.existsUserName(c, username)) {
-                DatabaseOperations.createUser(c, name, username, password);
+                DatabaseOperations.createUser(c, name, username, passCrypt);
                 response.setContentType("application/json");
                 pw = response.getWriter();
                 pw.println("{\"mess\":\"User created succesfully\"}");
